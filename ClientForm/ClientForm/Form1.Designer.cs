@@ -152,7 +152,7 @@ namespace ClientForm
             // 
             // imgConnesso
             // 
-            this.imgConnesso.Image = global::ClientForm.Properties.Resources.NonConnesso;
+            this.imgConnesso.ErrorImage = null;
             this.imgConnesso.Location = new System.Drawing.Point(389, 33);
             this.imgConnesso.Name = "imgConnesso";
             this.imgConnesso.Size = new System.Drawing.Size(23, 23);

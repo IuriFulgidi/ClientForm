@@ -63,26 +63,6 @@ namespace ClientForm.Properties {
         /// <summary>
         ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cerchioRosso {
-            get {
-                object obj = ResourceManager.GetObject("cerchioRosso", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap cerchioVerde {
-            get {
-                object obj = ResourceManager.GetObject("cerchioVerde", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Connesso {
             get {
                 object obj = ResourceManager.GetObject("Connesso", resourceCulture);

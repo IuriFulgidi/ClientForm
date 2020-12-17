@@ -15,20 +15,13 @@ namespace ClientForm
     public partial class Form1 : Form
     {
         Socket client;
+        bool connection = false;
         public Form1()
         {
             InitializeComponent();
             client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             imgConnesso.Image = Properties.Resources.NonConnesso;
-            Controllo();
-        }
-
-        private void Controllo()
-        {
-            if (lblConnessione.Text == "Connesso")
-                btnInvia.Enabled = true;
-            else
-                btnInvia.Enabled = false;
+            ControlloConnessione();
         }
 
         private void btnConnetti_Click(object sender, EventArgs e)
@@ -56,12 +49,25 @@ namespace ClientForm
 
             if (!errori)
             {
-                client.Connect(ipaddr, nPort);
-                lblConnessione.Text = "Connesso";
-                imgConnesso.Image = Properties.Resources.Connesso;
+                try
+                {
+                    client.Connect(ipaddr, nPort);
+                    connection = true;
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Errore");
+                    if(client!=null)
+                    {
+                        if (client.Connected)
+                            client.Shutdown(SocketShutdown.Both);
+                        client.Close();
+                        client.Dispose();
+                    }
+                }
             }
 
-            Controllo();
+            ControlloConnessione();
         }
 
         private void btnInvia_Click(object sender, EventArgs e)
@@ -71,23 +77,55 @@ namespace ClientForm
             int nReceivedBytes = 0;
             string mes = txtMsg.Text;
 
-            sendbuff = Encoding.ASCII.GetBytes(mes);
-            client.Send(sendbuff);
-
-            if (mes.ToUpper() == "QUIT")
+            try
             {
-                client.Disconnect(true);
-                lblConnessione.Text = "Non Connesso";
-                imgConnesso.Image = Properties.Resources.NonConnesso;
-                btnInvia.Enabled = false;
-                return;
+                sendbuff = Encoding.ASCII.GetBytes(mes);
+                client.Send(sendbuff);
+
+                if (mes.ToUpper() == "QUIT")
+                {
+                    if (client.Connected)
+                        client.Shutdown(SocketShutdown.Both);
+                    client.Close();
+                    client.Dispose();
+                    connection = false;
+                    ControlloConnessione();
+                    return;
+                }
+
+                nReceivedBytes = client.Receive(recvbuff);
+                string receivedString = Encoding.ASCII.GetString(recvbuff, 0, nReceivedBytes);
+                lstMsgs.Items.Add("S: " + receivedString);
+                Array.Clear(sendbuff, 0, sendbuff.Length);
             }
-
-            nReceivedBytes = client.Receive(recvbuff);
-            string receivedString = Encoding.ASCII.GetString(recvbuff, 0, nReceivedBytes);
-            lstMsgs.Items.Add("S: " + receivedString);
-
-            Array.Clear(sendbuff, 0, sendbuff.Length);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Errore");
+                if (client != null)
+                {
+                    if (client.Connected)
+                        client.Shutdown(SocketShutdown.Both);
+                    client.Close();
+                    client.Dispose();
+                }
+            }
+        }
+        private void ControlloConnessione()
+        {
+            if (connection)
+            {
+                lblConnessione.Text = "Connesso";
+                btnInvia.Enabled = true;
+                txtMsg.Enabled = true;
+                imgConnesso.Image = Properties.Resources.Connesso;
+            }
+            else
+            {
+                lblConnessione.Text = "Non Connesso";
+                btnInvia.Enabled = false;
+                txtMsg.Enabled = false;
+                imgConnesso.Image = Properties.Resources.NonConnesso;
+            }
         }
     }
 }
